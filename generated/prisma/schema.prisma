@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  password     String?
+  name         String
+  phoneNumber  String?
+  profileImg   String?
+  role         Role     @default(RIDER)
+  isOnline     Boolean  @default(false)
+  isDriverMode Boolean  @default(false)
+  location     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // OAuth related fields
+  googleId String? @unique
+
+  // Relations
+  ridesAsRider  Ride[]       @relation("RiderRides")
+  ridesAsDriver Ride[]       @relation("DriverRides")
+  driverRatings RideRating[] @relation("DriverRatings")
+  riderRatings  RideRating[] @relation("RiderRatings")
+  refreshTokens Token[]
+}
+
+// Role enum
+enum Role {
+  RIDER
+  DRIVER
+  ADMIN
+}
+
+// Ride model
+model Ride {
+  id                String     @id @default(uuid())
+  riderId           String
+  driverId          String?
+  status            RideStatus @default(PENDING)
+  pickupLocation    Json
+  dropoffLocation   Json
+  currentLocation   Json?
+  rideType          RideType   @default(STANDARD)
+  estimatedPrice    Float
+  actualPrice       Float?
+  estimatedDistance Float
+  estimatedDuration Int // in minutes
+  startTime         DateTime?
+  endTime           DateTime?
+  cancelReason      String?
+  canceledBy        String?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  // Relations
+  rider       User         @relation("RiderRides", fields: [riderId], references: [id])
+  driver      User?        @relation("DriverRides", fields: [driverId], references: [id])
+  rideRatings RideRating[]
+}
+
+// Ride status enum
+enum RideStatus {
+  PENDING
+  ACCEPTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELED
+}
+
+// Ride type enum
+enum RideType {
+  STANDARD
+  PREMIUM
+  SHARED
+}
+
+// Rating model
+model RideRating {
+  id          String   @id @default(uuid())
+  rideId      String
+  raterId     String
+  ratedUserId String
+  rating      Int
+  comment     String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  ride      Ride @relation(fields: [rideId], references: [id])
+  rater     User @relation("RiderRatings", fields: [raterId], references: [id])
+  ratedUser User @relation("DriverRatings", fields: [ratedUserId], references: [id])
+}
+
+// Token model for refresh tokens
+model Token {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+}

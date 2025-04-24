@@ -1,0 +1,43 @@
+{
+  "name": "ride-share-app",
+  "version": "1.0.0",
+  "description": "A fullstack scalable ride-sharing mobile app using modern web technologies",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run start:api",
+    "start:api": "cd api && npm start",
+    "start:mobile": "cd mobile && npm start",
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:mobile\"",
+    "dev:api": "cd api && npm run dev",
+    "dev:mobile": "cd mobile && npm start",
+    "build": "npm run build:api",
+    "build:api": "cd api && npm run build",
+    "prisma:generate": "cd prisma && npx prisma generate",
+    "prisma:migrate": "cd prisma && npx prisma migrate dev",
+    "prisma:studio": "cd prisma && npx prisma studio",
+    "install:all": "npm install && npm run install:api && npm run install:mobile",
+    "install:api": "cd api && npm install",
+    "install:mobile": "cd mobile && npm install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react-native",
+    "typescript",
+    "express",
+    "nodejs",
+    "postgresql",
+    "prisma",
+    "socket.io",
+    "ride-sharing",
+    "maps",
+    "mobile-app"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@prisma/client": "^5.3.1"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.1"
+  }
+} 
